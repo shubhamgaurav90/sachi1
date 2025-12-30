@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Sachi ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #2c0e3a;
+            background-image: radial-gradient(circle at 50% 50%, #4a1966 0%, #2c0e3a 100%);
+            color: white;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* --- SCREEN 0: COUNTDOWN --- */
+        .countdown-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 2rem;
+            color: #ffb7b2;
+            margin-bottom: 20px;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 10px;
+            border-radius: 10px;
+            width: 70px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .time-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .time-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .skip-btn {
+            margin-top: 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.6);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-color: white;
+        }
+
+        /* --- SCREEN 1: HEART --- */
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffb7b2;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #e0e0e0;
+            margin-bottom: 40px;
+        }
+
+        .heart-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .heart-bg {
+            font-size: 60px;
+            color: #ff6b81;
+            animation: pulse 1.5s infinite;
+        }
+
+        svg.progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            stroke: #ff6b81;
+            stroke-width: 6;
+            fill: transparent;
+            stroke-dasharray: 326;
+            stroke-dashoffset: 326;
+            transition: stroke-dashoffset 2s linear;
+            stroke-linecap: round;
+        }
+
+        .holding .progress-ring__circle {
+            stroke-dashoffset: 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .instruction {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* --- SCREEN 2: DISTRACTIONS --- */
+        .card-zone {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .distraction-card {
+            position: absolute;
+            width: 120px;
+            height: 160px;
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .distraction-card i { font-size: 2rem; margin-bottom: 10px; color: #6c5ce7; }
+        .distraction-card p { font-weight: bold; }
+
+        .c1 { top: 10%; left: 10%; transform: rotate(-10deg); z-index: 4; }
+        .c2 { top: 15%; right: 15%; transform: rotate(15deg); z-index: 3; }
+        .c3 { bottom: 10%; left: 20%; transform: rotate(-5deg); z-index: 5; background: #ffeaa7; }
+        .c4 { bottom: 20%; right: 10%; transform: rotate(8deg); z-index: 2; background: #fab1a0; }
+
+        .gift-box {
+            font-size: 80px;
+            cursor: pointer;
+            display: none;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        /* --- SCREEN 3: TICKET --- */
+        .ticket {
+            width: 300px;
+            height: 160px;
+            background: linear-gradient(135deg, #d4af37 0%, #f7ef8a 50%, #d4af37 100%);
+            border-radius: 15px;
+            color: #2c0e3a;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            border: 2px solid #fff;
+            position: relative;
+            transform: scale(0);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ticket.show { transform: scale(1); }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #2c0e3a;
+            padding-bottom: 5px;
+        }
+        
+        .ticket-body { text-align: center; font-weight: bold; font-family: 'Pacifico', cursive; font-size: 1.2rem; }
+        .ticket-footer { font-size: 0.7rem; text-align: right; }
+
+        .btn-claim {
+            margin-top: 30px;
+            padding: 10px 25px;
+            background: #ff6b81;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* --- SCREEN 4: PHOTOS --- */
+        .photo-gallery {
+            position: relative;
+            width: 300px;
+            height: 400px;
+        }
+
+        .photo-frame {
+            position: absolute;
+            width: 260px;
+            height: 320px;
+            background: white;
+            padding: 10px 10px 50px 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.6s ease, opacity 0.6s;
+            cursor: pointer;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        /* Stack Order */
+        .p1 { z-index: 3; transform: translate(-50%, -50%) rotate(-5deg); }
+        .p2 { z-index: 2; transform: translate(-50%, -50%) rotate(5deg); }
+        .p3 { z-index: 1; transform: translate(-50%, -50%) rotate(-2deg); }
+
+        .photo-frame.removed {
+            transform: translate(100vw, -100vh) rotate(45deg);
+            opacity: 0;
+        }
+
+        /* --- SCREEN 5: LETTER --- */
+        .card-container {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .envelope-cover {
+            width: 280px;
+            height: 380px;
+            background: #fff;
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .long-letter {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(44, 14, 58, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .letter-content {
+            background: #fffafa;
+            color: #4a4a4a;
+            padding: 30px;
+            border-radius: 5px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(255, 107, 129, 0.3);
+            line-height: 1.6;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .letter-content h2 { color: #ff6b81; text-align: center; margin-bottom: 20px; font-family: 'Pacifico', cursive; }
+        .letter-content p { margin-bottom: 10px; }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        
+        <div class="screen active" id="screen-0">
+            <h1 class="countdown-title">Wait for it...</h1>
+            
+            <div class="timer-container">
+                <div class="time-box">
+                    <span class="time-number" id="days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="hours">00</span>
+                    <span class="time-label">Hrs</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Min</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Sec</span>
+                </div>
+            </div>
+
+            <p style="opacity: 0.7; font-size: 0.9rem;">Almost there, Piddu ❤️</p>
+            
+            <button class="skip-btn" onclick="nextScreen(1)">Yes, I'm Sachi (Open Now)</button>
+        </div>
+
+        <div class="screen" id="screen-1">
+            <h1 class="title">A Surprise for my Chotu Don 🤏</h1>
+            <p class="subtitle">Before this year begins...</p>
+            
+            <div class="heart-container" id="heart-btn">
+                <svg class="progress-ring" width="120" height="120">
+                    <circle class="progress-ring__circle" stroke="white" stroke-width="4" fill="transparent" r="52" cx="60" cy="60"/>
+                </svg>
+                <div class="heart-bg">❤️</div>
+            </div>
+            
+            <p class="instruction">Tap and hold, Sachi</p>
+        </div>
+
+        <div class="screen" id="screen-2">
+            <h1 class="title">Something is waiting for you</h1>
+            <p class="subtitle">Move the distractions aside</p>
+            
+            <div class="card-zone">
+                <div class="distraction-card c1" onclick="flyAway(this)">
+                    <i>💼</i><p>Work</p>
+                </div>
+                <div class="distraction-card c2" onclick="flyAway(this)">
+                    <i>🌧️</i><p>Bad Days</p>
+                </div>
+                <div class="distraction-card c3" onclick="flyAway(this)">
+                    <i>😫</i><p>Stress</p>
+                </div>
+                <div class="distraction-card c4" onclick="flyAway(this)">
+                    <i>📍</i><p>Distance</p>
+                </div>
+
+                <div class="gift-box" id="gift-box" onclick="openGift()">
+                    🎁
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-3">
+            <div class="ticket" id="ticket">
+                <div class="ticket-header">
+                    <span>🎫</span>
+                    <span>Golden Ticket</span>
+                    <span>🎫</span>
+                </div>
+                <div class="ticket-body">
+                    "Unlimited Cuddles for Sachi"
+                </div>
+                <div class="ticket-footer">
+                    Valid for 2026 & Forever<br>No expiration date
+                </div>
+            </div>
+            <button class="btn-claim" onclick="nextScreen(4)">Claim Gift</button>
+        </div>
+
+        <div class="screen" id="screen-4">
+            <h1 class="title">Our Beautiful Moments</h1>
+            <p class="subtitle">Tap the photo to continue</p>
+            
+            <div class="photo-gallery">
+                <div class="photo-frame p1" onclick="nextPhoto(this)">
+                    <img src="i2.jpg" alt="Memory 1">
+                </div>
+                
+                <div class="photo-frame p2" onclick="nextPhoto(this)">
+                     <img src="i4.jpg" alt="Memory 2">
+                </div>
+                
+                <div class="photo-frame p3" onclick="nextPhoto(this)">
+                     <img src="n11.jpg" alt="Memory 3">
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-5">
+            <h1 class="title">For my Piddu ❤️</h1>
+            <p class="subtitle">Tap the card to read</p>
+            
+            <div class="card-container" onclick="showLetter()">
+                <div class="envelope-cover">
+                    <h2 style="color:#ff6b81; font-family:'Pacifico'; font-size: 2rem;">Happy<br>New Year<br>2026</h2>
+                    <span style="font-size:3rem;">🧸</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="long-letter" id="full-letter">
+            <div class="letter-content">
+                <h2>My Dearest Sachi,</h2>
+                <p>
+                    Happy New Year, my Chotu Don! ✨
+                </p>
+                <p>
+                    As we step into 2026, I just want to tell you how lucky I am to have you as my better half. You make my world brighter just by being in it.
+                </p>
+                <p>
+                    I hope this year brings you as much happiness as you bring to me. No matter what happens, good or bad, I will always be standing right beside you.
+                </p>
+                <p>
+                    You might be my little Piddu, but you have the biggest place in my heart. Let's make this year our best one yet.
+                </p>
+                <p>
+                    I love you mera baccha🧿❤️
+                </p>
+                <button class="btn-claim" style="margin-top:20px;" onclick="closeLetter()">Close</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        /* --- JS LOGIC --- */
+        
+        // --- COUNTDOWN LOGIC ---
+        // Target Date: Jan 1, 2026 00:00:00
+        const targetDate = new Date("Jan 1, 2026 00:00:00").getTime();
+
+        const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // Calculations
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display
+            document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+            document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+
+            // If countdown is finished, auto-start
+            if (distance < 0) {
+                clearInterval(timer);
+                nextScreen(1); // Jump to heart screen
+            }
+        }, 1000);
+
+        // --- SCREEN NAVIGATION ---
+        function nextScreen(num) {
+            // Find currently active screen and remove active class
+            const current = document.querySelector('.screen.active');
+            if(current) current.classList.remove('active');
+            
+            // Activate new screen
+            document.getElementById(`screen-${num}`).classList.add('active');
+            
+            // Specific animation triggers
+            if(num === 3) {
+                setTimeout(() => {
+                    document.getElementById('ticket').classList.add('show');
+                    fireConfetti();
+                }, 500);
+            }
+        }
+
+        // --- HEART BUTTON LOGIC ---
+        const heartBtn = document.getElementById('heart-btn');
+        let holdTimer;
+
+        ['mousedown', 'touchstart'].forEach(evt => 
+            heartBtn.addEventListener(evt, (e) => {
+                e.preventDefault();
+                heartBtn.classList.add('holding');
+                holdTimer = setTimeout(() => {
+                    nextScreen(2);
+                }, 2000);
+            })
+        );
+
+        ['mouseup', 'mouseleave', 'touchend'].forEach(evt => 
+            heartBtn.addEventListener(evt, () => {
+                heartBtn.classList.remove('holding');
+                clearTimeout(holdTimer);
+            })
+        );
+
+        // --- DISTRACTION LOGIC ---
+        let cardsRemoved = 0;
+        function flyAway(card) {
+            const x = (Math.random() - 0.5) * 500;
+            const y = -500 - Math.random() * 500;
+            card.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random()*90}deg)`;
+            card.style.opacity = '0';
+            cardsRemoved++;
+            if (cardsRemoved === 4) {
+                setTimeout(() => {
+                    document.getElementById('gift-box').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        function openGift() {
+            fireConfetti();
+            nextScreen(3);
+        }
+
+        // --- PHOTO LOGIC ---
+        function nextPhoto(el) {
+            el.classList.add('removed');
+            const remaining = document.querySelectorAll('.photo-frame:not(.removed)');
+            if(remaining.length === 0) {
+                setTimeout(() => nextScreen(5), 800);
+            }
+        }
+
+        // --- LETTER LOGIC ---
+        function showLetter() {
+            document.getElementById('full-letter').style.display = 'flex';
+        }
+        function closeLetter() {
+            document.getElementById('full-letter').style.display = 'none';
+        }
+
+        // --- CONFETTI LOGIC ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const pieces = [];
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+
+        function fireConfetti() {
+            for(let i=0; i<100; i++) {
+                pieces.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 10 + 5,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20 - 10,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 100
+                });
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            for(let i=0; i<pieces.length; i++) {
+                let p = pieces[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.5;
+                p.life--;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+            }
+            for(let i=pieces.length-1; i>=0; i--) {
+                if(pieces[i].life <= 0) pieces.splice(i, 1);
+            }
+            if(pieces.length > 0) requestAnimationFrame(updateConfetti);
+        }
+    </script>
+</body>
+</html>
